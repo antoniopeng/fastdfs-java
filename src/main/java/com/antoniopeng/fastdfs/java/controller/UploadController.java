@@ -3,10 +3,7 @@ package com.antoniopeng.fastdfs.java.controller;
 import com.antoniopeng.fastdfs.java.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -28,29 +25,31 @@ public class UploadController {
     /**
      * 文件上传
      *
-     * @param dropFile    Dropzone
-     * @param editorFiles wangEditor
+     * @param file  单文件
+     * @param files 多文件
      * @return
      */
     @RequestMapping(value = "upload", method = RequestMethod.POST)
-    public Map<String, Object> upload(MultipartFile dropFile, MultipartFile[] editorFiles) {
+    public Map<String, Object> upload(
+            @RequestParam(value = "file") MultipartFile file,
+            @RequestParam(value = "files") MultipartFile[] files) {
         Map<String, Object> result = new HashMap<>();
 
-        // Dropzone 上传
-        if (dropFile != null) {
-            result.put("fileName", writeFile(dropFile));
+        // 单文件 上传
+        if (file != null) {
+            result.put("fileName", writeFile(file));
         }
 
-        // wangEditor 上传
-        if (editorFiles != null && editorFiles.length > 0) {
+        // 多文件 上传
+        if (files != null && files.length > 0) {
             List<String> fileNames = new ArrayList<>();
 
-            for (MultipartFile editorFile : editorFiles) {
-                fileNames.add(writeFile(editorFile));
+            for (MultipartFile multipartFile : files) {
+                fileNames.add(writeFile(multipartFile));
             }
 
             result.put("errno", 0);
-            result.put("data", fileNames);
+            result.put("fileNames", fileNames);
         }
 
         return result;
